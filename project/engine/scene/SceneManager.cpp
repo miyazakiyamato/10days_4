@@ -53,8 +53,8 @@ void SceneManager::Draw() {
 }
 
 void SceneManager::ChangeScene(std::string sceneName) {
-	assert(sceneFactory_);
-	assert(nextScene_ == nullptr);
+	if (sceneFactory_ == nullptr) { return; };
+	if (nextScene_ != nullptr) { return; };
 
 	if (scene_ == nullptr) {
 		//最初のシーンの場合は即座にセットする
@@ -84,7 +84,8 @@ void SceneManager::ReturnScene() {
 }
 
 void SceneManager::ChangeTransition(std::string transitionName, bool isGamePaused){
-	assert(transitionFactory_);
+	if (transitionFactory_ == nullptr) { return; };
+
 	if (transition_ != nullptr) {
 		// すでにFadeIn中なら中断して次のFadeOutを開始する
 		if (transition_->GetType() == BaseTransition::Type::kIn) {
