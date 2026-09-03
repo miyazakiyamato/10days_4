@@ -1,0 +1,72 @@
+#include "ModelManager.h"
+
+namespace Engine {
+
+std::unique_ptr<ModelManager> ModelManager::instance = nullptr;
+
+ModelManager* ModelManager::GetInstance(){
+	if (instance == nullptr) {
+		instance = std::make_unique<ModelManager>(PrivateToken{});
+	}
+	return instance.get();
+}
+
+void ModelManager::Initialize(DirectXCommon* dxCommon, SrvUavManager* srvUavManager){
+	dxCommon_ = dxCommon;
+	srvUavManager_ = srvUavManager;
+}
+
+void ModelManager::Finalize(){
+	instance.reset();
+}
+
+void ModelManager::LoadModel(const std::string& filePath){
+	//読み込み済みモデルを検索
+	if (models.contains(filePath)) {
+		//読み込み済みなら早期return
+		return;
+	}
+	//モデルの生成とファイル読み込み、初期化
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	model->Initialize(dxCommon_, "resources/", filePath);
+
+	//モデルをmapコンテナに格納する
+	models.insert(std::make_pair(filePath, std::move(model)));
+}
+
+Model* ModelManager::FindModel(const std::string& filePath){
+	//読み込み済みモデルを検索
+	if (models.contains(filePath)) {
+		//読み込みモデルを戻り値としてreturn
+		return models.at(filePath).get();
+	}
+
+	//ファイル名一致なし
+	return nullptr;
+}
+
+void ModelManager::LoadAnimation(const std::string& filePath){
+	//読み込み済みアニメーションを検索
+	if (animations.contains(filePath)) {
+		//読み込み済みなら早期return
+		return;
+	}
+	//アニメーションの生成とファイル読み込み、初期化
+	std::unique_ptr<Animation> animation = std::make_unique<Animation>();
+	animation->LoadFile(filePath);
+
+	//アニメーションをmapコンテナに格納する
+	animations.insert(std::make_pair(filePath, std::move(animation)));
+}
+
+Animation* ModelManager::FindAnimation(const std::string& filePath){
+	//読み込み済みアニメーションを検索
+	if (animations.contains(filePath)) {
+		//読み込みアニメーションを戻り値としてreturn
+		return animations.at(filePath).get();
+	}
+	//ファイル名一致なし
+	return nullptr;
+}
+
+} // namespace Engine

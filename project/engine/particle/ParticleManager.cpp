@@ -1,0 +1,368 @@
+#include "ParticleManager.h"
+#include "DirectXCommon.h"
+#include "SrvUavManager.h"
+#include "TextureManager.h"
+#include "CameraManager.h"
+#include <numbers>
+#include "PipelineManager.h"
+#include "TimeManager.h"
+#include "GlobalVariables.h"
+#ifdef USE_IMGUI
+#include <imgui.h>
+#endif // USE_IMGUI
+
+namespace Engine {
+
+std::unique_ptr<ParticleManager> ParticleManager::instance = nullptr;
+
+ParticleManager* ParticleManager::GetInstance(){
+	if (instance == nullptr) {
+		instance = std::make_unique<ParticleManager>(PrivateToken{});
+	}
+	return instance.get();
+}
+
+void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvUavManager* srvUavManager) {
+	dxCommon_ = dxCommon;
+	srvUavManager_ = srvUavManager;
+	//worldViewProjection用のリソースを作成
+	perViewResource_ = dxCommon_->CreateBufferResource(sizeof(PerView));
+	perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
+	//パイプラインの作成
+	initCSPipelineName_ = PipelineManager::GetInstance()->CreateComputePipelineState("InitializeParticle");
+	updateCSPipelineName_ = PipelineManager::GetInstance()->CreateComputePipelineState("UpdateParticle");
+
+	//ランダムエンジンの初期化
+	std::random_device seedGenerator;
+	std::mt19937 randomEngine(seedGenerator());
+	randomEngine_ = randomEngine;
+	//調整項目の初期化
+	InitializeGlobalVariables();
+	ApplyGlobalVariables();
+}
+
+void ParticleManager::Finalize() {
+	instance.reset();
+}
+
+void ParticleManager::Update() {
+
+	Matrix4x4 viewProjectionMatrix = Matrix4x4::MakeIdentity4x4();
+	Matrix4x4 billboardMatrix = Matrix4x4::MakeIdentity4x4();
+	
+	if (CameraManager::GetInstance()->GetCamera()) {
+		viewProjectionMatrix = CameraManager::GetInstance()->GetCamera()->GetViewProjectionMatrix();
+		billboardMatrix = CameraManager::GetInstance()->GetCamera()->GetWorldMatrix();
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
+	}
+	perViewData_->viewProjection = viewProjectionMatrix;
+	perViewData_->billboardMatrix = billboardMatrix;
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+	
+	// コンピュートパイプライン設定
+	srvUavManager_->PreDraw();
+	PipelineManager::GetInstance()->DrawSettingCS(updateCSPipelineName_);
+	// フレームごとの時間情報をCBufferに設定
+	commandList->SetComputeRootConstantBufferView(1, TimeManager::GetInstance()->GetPerFrameResource()->GetGPUVirtualAddress());
+	// 全グループの更新
+	for (auto& [name, group] : particleGroups) {
+		// UAVの処理をまたがないようにするバリア
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.UAV.pResource = group->particleResource.Get();
+		commandList->ResourceBarrier(1, &barrier);
+		// UAVをルートシグネチャに設定
+		srvUavManager_->SetComputeRootDescriptorTable(0, group->particleUavIndex);
+		// freeListのリソースをUAVに設定
+		srvUavManager_->SetComputeRootDescriptorTable(2, group->freeListIndexUAVIndex);
+		srvUavManager_->SetComputeRootDescriptorTable(3, group->freeListUAVIndex);
+		commandList->SetComputeRootConstantBufferView(4, group->maxParticlesResource->GetGPUVirtualAddress());
+		// Compute Shaderを実行
+		commandList->Dispatch(UINT((group->limit->kMaxParticles + 1023) / 1024), 1, 1);
+	}
+}
+
+void ParticleManager::Draw() {
+	// コマンドリストの取得
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+
+	// 全てのパーティクルグループについて処理
+	for (auto& [name, group] : particleGroups) {
+		// パイプラインを設定
+		PipelineManager::GetInstance()->DrawSetting(group->pipelineStateName);
+
+		commandList->IASetVertexBuffers(0, 1, &group->vertexBufferView);// VBVを設定
+		commandList->IASetIndexBuffer(&group->indexBufferView);//IBVを設定
+		// インスタンシングデータのSRVのDescriptorTableを設定
+		srvUavManager_->SetGraphicsRootDescriptorTable(0, group->particleSrvIndex);
+		// SRVのDescriptorTableの先頭を設定
+		commandList->SetGraphicsRootDescriptorTable(1, TextureManager::GetInstance()->GetSrvHandleGPU(group->materialData.textureFilePath));
+		// 定数バッファのDescriptorTableを設定
+		commandList->SetGraphicsRootConstantBufferView(2, perViewResource_->GetGPUVirtualAddress());
+		// DrawCall (インスタンシング描画)
+		commandList->DrawIndexedInstanced(group->kParticleIndexNum, group->limit->kMaxParticles, 0, 0, 0);
+	}
+}
+
+void ParticleManager::CreateParticleGroup(const std::string name,uint32_t kMaxParticles) {
+	if (particleGroups.count(name) != 0) {
+		return;
+	}
+	// パーティクルグループの作成と初期化
+	auto group = std::make_unique<ParticleGroup>();
+
+	// State
+	PipelineState pipelineState;
+	pipelineState.shaderName = "Particle";
+	pipelineState.blendMode = group->blendMode_;
+	pipelineState.cullMode = CullMode::kNone;//カリングなし
+	pipelineState.depthMode = DepthMode::kReadOnly;//読み込み
+	group->pipelineStateName = PipelineManager::GetInstance()->CreatePipelineState(pipelineState);
+	
+	// 頂点
+	CreatePlane(group.get());
+	// TextureManagerからGPUハンドルを取得
+	group->materialData.srvIndex = TextureManager::GetInstance()->GetSrvIndex(group->materialData.textureFilePath);
+
+	//limit->kMaxParticlesのリソースを作成
+	group->maxParticlesResource = dxCommon_->CreateBufferResource(sizeof(Limit));
+	group->maxParticlesResource->Map(0, nullptr, reinterpret_cast<void**>(&group->limit));
+	group->limit->kMaxParticles = kMaxParticles;
+	// パーティクル用リソースの作成
+	group->particleResource = dxCommon_->CreateRWBufferResource(sizeof(Particle) * group->limit->kMaxParticles);
+	// UAVとSRVを作成
+	group->particleUavIndex = srvUavManager_->Allocate();
+	group->particleSrvIndex = srvUavManager_->Allocate();
+	srvUavManager_->CreateUAVforStructuredBuffer(group->particleUavIndex, group->particleResource.Get(), group->limit->kMaxParticles, sizeof(Particle));
+	srvUavManager_->CreateSRVforStructuredBuffer(group->particleSrvIndex, group->particleResource.Get(), group->limit->kMaxParticles, sizeof(Particle));
+	// freeListのリソースを作成
+	group->freeListIndexResource = dxCommon_->CreateRWBufferResource(sizeof(int32_t));
+	group->freeListIndexUAVIndex = srvUavManager_->Allocate();
+	srvUavManager_->CreateUAVforStructuredBuffer(group->freeListIndexUAVIndex, group->freeListIndexResource.Get(), 1, sizeof(int32_t));
+	group->freeListResource = dxCommon_->CreateRWBufferResource(sizeof(uint32_t) * group->limit->kMaxParticles);
+	group->freeListUAVIndex = srvUavManager_->Allocate();
+	srvUavManager_->CreateUAVforStructuredBuffer(group->freeListUAVIndex, group->freeListResource.Get(), group->limit->kMaxParticles, sizeof(uint32_t));
+
+	CreateParticle(group.get());
+
+	particleGroups[name] = std::move(group);
+}
+void ParticleManager::ClearParticleGroup(const std::string name){
+	// パーティクルグループの削除
+	auto it = particleGroups.find(name);
+	if (it != particleGroups.end()) {
+		it->second.reset();
+		particleGroups.erase(it);
+	}
+}
+void ParticleManager::CreateParticle(ParticleGroup* group){
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+	// リソースバリアをUAVに遷移
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Transition.pResource = group->particleResource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	commandList->ResourceBarrier(1, &barrier);
+
+	// コンピュートパイプライン設定
+	srvUavManager_->PreDraw();
+	PipelineManager::GetInstance()->DrawSettingCS(initCSPipelineName_);
+	// UAVをルートシグネチャに設定
+	srvUavManager_->SetComputeRootDescriptorTable(0, group->particleUavIndex);
+	// freeListのリソースをUAVに設定
+	srvUavManager_->SetComputeRootDescriptorTable(1, group->freeListIndexUAVIndex);
+	srvUavManager_->SetComputeRootDescriptorTable(2, group->freeListUAVIndex);
+	// パーティクルの最大値をCBufferに設定
+	commandList->SetComputeRootConstantBufferView(3, group->maxParticlesResource->GetGPUVirtualAddress());
+	// Compute Shaderを実行
+	commandList->Dispatch(UINT((group->limit->kMaxParticles + 1023) / 1024), 1, 1);
+	// リソースバリアをSRV（描画で使う状態）に戻す
+	barrier.Transition.pResource = group->particleResource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+	commandList->ResourceBarrier(1, &barrier);
+}
+void ParticleManager::CreatePlane(ParticleGroup* group){
+	// 頂点
+	group->kParticleVertexNum = 4;
+	group->kParticleIndexNum = 6;
+	// 頂点リソースの生成
+	group->vertexResource = dxCommon_->CreateBufferResource(sizeof(VertexData) * group->kParticleVertexNum);
+
+	// 頂点バッファビューの生成
+	group->vertexBufferView.BufferLocation = group->vertexResource->GetGPUVirtualAddress();
+	group->vertexBufferView.SizeInBytes = sizeof(VertexData) * group->kParticleVertexNum;
+	group->vertexBufferView.StrideInBytes = sizeof(VertexData);
+	// 頂点リソースに頂点データを書き込む
+	group->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&group->vertexData));
+	// テクスチャの頂点
+	TextureManager::GetInstance()->LoadTexture(group->materialData.textureFilePath);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(group->materialData.textureFilePath);
+	group->textureSize_.x = static_cast<float>(metadata.width);
+	group->textureSize_.y = static_cast<float>(metadata.height);
+
+	float tex_left = group->textureLeftTop_.x / metadata.width;
+	float tex_right = (group->textureLeftTop_.x + group->textureSize_.x) / metadata.width;
+	float tex_top = group->textureLeftTop_.y / metadata.height;
+	float tex_bottom = (group->textureLeftTop_.y + group->textureSize_.y) / metadata.height;
+
+	// 頂点データを設定（四角形を構成）
+	group->vertexData[0] = { { -0.5f, -0.5f, 0.0f, 1.0f }, { tex_left ,tex_bottom } };//左下
+	group->vertexData[1] = { { -0.5f,  0.5f, 0.0f, 1.0f }, { tex_left ,tex_top    } };//左上
+	group->vertexData[2] = { {  0.5f, -0.5f, 0.0f, 1.0f }, { tex_right,tex_bottom } };//右下
+	group->vertexData[3] = { {  0.5f,  0.5f, 0.0f, 1.0f }, { tex_right,tex_top    } };//右上
+	group->vertexResource->Unmap(0, nullptr);
+
+	// インデックスリソースの生成
+	group->indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * group->kParticleIndexNum);
+
+	// インデックスバッファビューの生成
+	group->indexBufferView.BufferLocation = group->indexResource->GetGPUVirtualAddress();
+	group->indexBufferView.SizeInBytes = sizeof(uint32_t) * group->kParticleIndexNum;
+	group->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+	group->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&group->indexData));
+	group->indexData[0] = 0; group->indexData[1] = 1; group->indexData[2] = 2;
+	group->indexData[3] = 1; group->indexData[4] = 3; group->indexData[5] = 2;
+	group->indexResource->Unmap(0, nullptr);
+}
+void ParticleManager::CreateRing(ParticleGroup* group, const uint32_t& kDivide, float kOuterRadius, float kInnerRadius){
+	group->kParticleVertexNum = 4 * kDivide;
+	group->kParticleIndexNum = 6 * kDivide;
+	// 頂点リソースの生成
+	group->vertexResource = dxCommon_->CreateBufferResource(sizeof(VertexData) * group->kParticleVertexNum);
+
+	// 頂点バッファビューの生成
+	group->vertexBufferView.BufferLocation = group->vertexResource->GetGPUVirtualAddress();
+	group->vertexBufferView.SizeInBytes = sizeof(VertexData) * group->kParticleVertexNum;
+	group->vertexBufferView.StrideInBytes = sizeof(VertexData);
+	// 頂点リソースに頂点データを書き込む
+	group->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&group->vertexData));
+	//テクスチャの頂点
+	TextureManager::GetInstance()->LoadTexture(group->materialData.textureFilePath);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(group->materialData.textureFilePath);
+	group->textureSize_.x = static_cast<float>(metadata.width);
+	group->textureSize_.y = static_cast<float>(metadata.height);
+
+	// インデックスリソースの生成
+	group->indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * group->kParticleIndexNum);
+
+	// インデックスバッファビューの生成
+	group->indexBufferView.BufferLocation = group->indexResource->GetGPUVirtualAddress();
+	group->indexBufferView.SizeInBytes = sizeof(uint32_t) * group->kParticleIndexNum;
+	group->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	group->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&group->indexData));
+	
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kDivide);
+	for (uint32_t index = 0; index < kDivide; index++) {
+		float sin = std::sin(radianPerDivide * float(index));
+		float cos = std::cos(radianPerDivide * float(index));
+		float sinNext = std::sin(radianPerDivide * float(index + 1));
+		float cosNext = std::cos(radianPerDivide * float(index + 1));
+		float u = float(index) / float(kDivide);
+		float uNext = float(index + 1) / float(kDivide);
+		group->vertexData[index * 4 + 0] = { { kOuterRadius * -sin,     kOuterRadius * cos, 0.0f, 1.0f },     { u ,0.0f }};//左下
+		group->vertexData[index * 4 + 1] = { { kInnerRadius * -sin,     kInnerRadius * cos, 0.0f, 1.0f },     { u ,1.0f }};//左上
+		group->vertexData[index * 4 + 2] = { { kOuterRadius * -sinNext, kOuterRadius * cosNext, 0.0f, 1.0f }, { uNext ,0.0f }};//右下
+		group->vertexData[index * 4 + 3] = { { kInnerRadius * -sinNext, kInnerRadius * cosNext, 0.0f, 1.0f }, { uNext ,1.0f }};//右上
+
+		group->indexData[index * 6 + 0] = index * 4 + 0; group->indexData[index * 6 + 1] = index * 4 + 1; group->indexData[index * 6 + 2] = index * 4 + 2;
+		group->indexData[index * 6 + 3] = index * 4 + 1; group->indexData[index * 6 + 4] = index * 4 + 3; group->indexData[index * 6 + 5] = index * 4 + 2;
+	}
+	group->vertexResource->Unmap(0, nullptr);
+	group->indexResource->Unmap(0, nullptr);
+}
+void ParticleManager::CreateCylinder(ParticleGroup* group, const uint32_t& kDivide, float kTopRadius, float kBottomRadius, float kHeight){
+	group->kParticleVertexNum = 4 * kDivide;
+	group->kParticleIndexNum = 6 * kDivide;
+	// 頂点リソースの生成
+	group->vertexResource = dxCommon_->CreateBufferResource(sizeof(VertexData) * group->kParticleVertexNum);
+
+	// 頂点バッファビューの生成
+	group->vertexBufferView.BufferLocation = group->vertexResource->GetGPUVirtualAddress();
+	group->vertexBufferView.SizeInBytes = sizeof(VertexData) * group->kParticleVertexNum;
+	group->vertexBufferView.StrideInBytes = sizeof(VertexData);
+	// 頂点リソースに頂点データを書き込む
+	group->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&group->vertexData));
+
+	//テクスチャの頂点
+	TextureManager::GetInstance()->LoadTexture(group->materialData.textureFilePath);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(group->materialData.textureFilePath);
+	group->textureSize_.x = static_cast<float>(metadata.width);
+	group->textureSize_.y = static_cast<float>(metadata.height);
+
+	// インデックスリソースの生成
+	group->indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * group->kParticleIndexNum);
+
+	// インデックスバッファビューの生成
+	group->indexBufferView.BufferLocation = group->indexResource->GetGPUVirtualAddress();
+	group->indexBufferView.SizeInBytes = sizeof(uint32_t) * group->kParticleIndexNum;
+	group->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	group->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&group->indexData));
+
+
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kDivide);
+	const float flipY = 1.0f;
+	for (uint32_t index = 0; index < kDivide; index++) {
+		float sin = std::sin(radianPerDivide * float(index));
+		float cos = std::cos(radianPerDivide * float(index));
+		float sinNext = std::sin(radianPerDivide * float(index + 1));
+		float cosNext = std::cos(radianPerDivide * float(index + 1));
+		float u = float(index) / float(kDivide);
+		float uNext = float(index + 1) / float(kDivide);
+		group->vertexData[index * 4 + 1] = { { kTopRadius * -sin,   kHeight,kTopRadius * cos, 1.0f },     { u ,flipY - 0.0f }};//左上 // normal{-sin,0.0f,cos}
+		group->vertexData[index * 4 + 3] = { { kTopRadius * -sinNext, kHeight,kTopRadius * cosNext, 1.0f }, { uNext ,flipY - 0.0f }};//右上 // {-sinNext,0.0f,cosNext}
+		group->vertexData[index * 4 + 0] = { { kBottomRadius * -sin,  0.0f, kBottomRadius * cos, 1.0f },     { u ,flipY - 1.0f }};//左下 // {-sinNext,0.0f,cosNext}
+		group->vertexData[index * 4 + 2] = { { kBottomRadius * -sinNext, 0.0f,kBottomRadius * cosNext, 1.0f }, { uNext ,flipY - 1.0f }};//右下 // {-sinNext,0.0f,cosNext}
+
+		group->indexData[index * 6 + 0] = index * 4 + 0; group->indexData[index * 6 + 1] = index * 4 + 1; group->indexData[index * 6 + 2] = index * 4 + 2;
+		group->indexData[index * 6 + 3] = index * 4 + 1; group->indexData[index * 6 + 4] = index * 4 + 3; group->indexData[index * 6 + 5] = index * 4 + 2;
+
+	}
+	group->vertexResource->Unmap(0, nullptr);
+	group->indexResource->Unmap(0, nullptr);
+}
+
+//調整項目の初期化
+void ParticleManager::InitializeGlobalVariables(){
+	
+}
+
+// 調整項目の適用
+void ParticleManager::ApplyGlobalVariables() {
+	
+}
+
+ParticleManager::ParticleGroup* ParticleManager::GetParticleGroup(std::string name) {
+	if (particleGroups.count(name) == 0) {
+		return nullptr;
+	}
+	return particleGroups[name].get();
+}
+
+void ParticleManager::SetBlendMode(std::string name, BlendMode blendMode) {
+	particleGroups[name]->blendMode_ = blendMode;
+	PipelineState pipelineState;
+	pipelineState.shaderName = "Particle";
+	pipelineState.blendMode = particleGroups[name]->blendMode_;
+	pipelineState.cullMode = CullMode::kNone;//カリングなし
+	pipelineState.depthMode = DepthMode::kReadOnly;//読み込み
+	pipelineState.staticSamplersMode = StaticSamplersMode::kclamp;
+	particleGroups[name]->pipelineStateName = PipelineManager::GetInstance()->CreatePipelineState(pipelineState);
+}
+
+void ParticleManager::SetTexture(std::string name, std::string textureName){
+	particleGroups[name]->materialData.textureFilePath = textureName;
+}
+
+void ParticleManager::SetRing(std::string name, const uint32_t& kDivide, float kOuterRadius, float kInnerRadius){
+	CreateRing(particleGroups[name].get(), kDivide, kOuterRadius, kInnerRadius);
+}
+void ParticleManager::SetCylinder(std::string name, const uint32_t& kDivide, float kTopRadius, float kBottomRadius, float kHeight) {
+	CreateCylinder(particleGroups[name].get(), kDivide, kTopRadius, kBottomRadius, kHeight);
+}
+
+} // namespace Engine

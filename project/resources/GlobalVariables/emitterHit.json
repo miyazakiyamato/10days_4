@@ -1,0 +1,68 @@
+{
+    "emitterHit": {
+        "Count": 30,
+        "EndColor": [
+            1.0,
+            0.9411764740943909,
+            0.0,
+            0.0
+        ],
+        "EndScale": [
+            5.0,
+            5.0,
+            5.0
+        ],
+        "EndUvTranslate": [
+            0.0,
+            0.0
+        ],
+        "Frequency": 3.0,
+        "IsBillboard": true,
+        "IsEmitUpdate": false,
+        "RLifeTimeMax": 1.0,
+        "RLifeTimeMin": 0.5,
+        "RVelocityMax": [
+            10.0,
+            10.0,
+            10.0
+        ],
+        "RVelocityMin": [
+            -10.0,
+            -10.0,
+            -10.0
+        ],
+        "Radius": 0.0,
+        "StartColor": [
+            1.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "StartScale": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "StartUvTranslate": [
+            0.0,
+            0.0
+        ]
+    },
+    "emitterHit_DisplayOrder": [
+        "Radius",
+        "Count",
+        "Frequency",
+        "IsBillboard",
+        "IsEmitUpdate",
+        "StartColor",
+        "EndColor",
+        "RLifeTimeMin",
+        "RLifeTimeMax",
+        "StartScale",
+        "EndScale",
+        "RVelocityMin",
+        "RVelocityMax",
+        "StartUvTranslate",
+        "EndUvTranslate"
+    ]
+}

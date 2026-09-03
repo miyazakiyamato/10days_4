@@ -1,0 +1,18 @@
+{
+    "FollowCamera": {
+        "offset": [
+            0.0,
+            0.30000001192092896,
+            -35.0
+        ],
+        "rotateOffset": [
+            0.10000000149011612,
+            0.0,
+            0.0
+        ]
+    },
+    "FollowCamera_DisplayOrder": [
+        "offset",
+        "rotateOffset"
+    ]
+}

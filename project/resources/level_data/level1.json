@@ -1,0 +1,1396 @@
+{
+    "name": "scene",
+    "objects": [
+        {
+            "type": "LIGHT",
+            "name": "Light",
+            "transform": {
+                "translation": [
+                    9.924007415771484,
+                    48.38810729980469,
+                    36.9810791015625
+                ],
+                "rotation": [
+                    37.26104736328125,
+                    3.1637070178985596,
+                    106.93632507324219
+                ],
+                "scaling": [
+                    5.27607536315918,
+                    5.27607536315918,
+                    5.2760748863220215
+                ]
+            }
+        },
+        {
+            "type": "CAMERA",
+            "name": "Camera",
+            "transform": {
+                "translation": [
+                    27.566917419433594,
+                    -0.9057908058166504,
+                    18.19281005859375
+                ],
+                "rotation": [
+                    63.559295654296875,
+                    2.2983238068263745e-07,
+                    46.69194412231445
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "PlayerSpawn",
+            "name": "PlayerSpawn",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.40222781896591187,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "MESH",
+            "name": "Cube",
+            "transform": {
+                "translation": [
+                    27.458784103393555,
+                    82.25324249267578,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "EnemyPopEvent",
+            "name": "EnemyPopEvent",
+            "transform": {
+                "translation": [
+                    10.606377601623535,
+                    65.76667022705078,
+                    2.760542869567871
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": [
+                {
+                    "type": "EnemySpawn",
+                    "name": "EnemySpawn.008",
+                    "transform": {
+                        "translation": [
+                            29.535545349121094,
+                            43.74812316894531,
+                            2.790679931640625
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "Rail",
+                            "name": "SmallDroneStateShoot.002",
+                            "transform": {
+                                "translation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": [
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.013",
+                                    "transform": {
+                                        "translation": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.014",
+                                    "transform": {
+                                        "translation": [
+                                            -11.40948486328125,
+                                            15.557884216308594,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.015",
+                                    "transform": {
+                                        "translation": [
+                                            -24.663301467895508,
+                                            21.088478088378906,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.016",
+                                    "transform": {
+                                        "translation": [
+                                            -39.46290969848633,
+                                            16.32384490966797,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "EnemySpawn",
+                    "name": "EnemySpawn.009",
+                    "transform": {
+                        "translation": [
+                            15.428380012512207,
+                            27.2784423828125,
+                            2.7197484970092773
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "Rail",
+                            "name": "SmallDroneStateShoot",
+                            "transform": {
+                                "translation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": [
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.009",
+                                    "transform": {
+                                        "translation": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.010",
+                                    "transform": {
+                                        "translation": [
+                                            -11.079713821411133,
+                                            13.132377624511719,
+                                            0.10007810592651367
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.011",
+                                    "transform": {
+                                        "translation": [
+                                            -23.07054328918457,
+                                            16.935882568359375,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.012",
+                                    "transform": {
+                                        "translation": [
+                                            -34.86924743652344,
+                                            10.136238098144531,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "EnemySpawn",
+                    "name": "EnemySpawn.010",
+                    "transform": {
+                        "translation": [
+                            16.287139892578125,
+                            65.3562240600586,
+                            4.538580417633057
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "Rail",
+                            "name": "SmallDroneStateShoot.001",
+                            "transform": {
+                                "translation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": [
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.017",
+                                    "transform": {
+                                        "translation": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.018",
+                                    "transform": {
+                                        "translation": [
+                                            -8.50827407836914,
+                                            6.993255615234375,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.019",
+                                    "transform": {
+                                        "translation": [
+                                            -24.657169342041016,
+                                            9.981277465820312,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.020",
+                                    "transform": {
+                                        "translation": [
+                                            -39.70888137817383,
+                                            6.362152099609375,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "CAMERA",
+            "name": "カメラ",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": [
+                {
+                    "type": "Rail",
+                    "name": "Rail",
+                    "transform": {
+                        "translation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn",
+                            "transform": {
+                                "translation": [
+                                    0.13780975341796875,
+                                    -3.754964828491211,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.001",
+                            "transform": {
+                                "translation": [
+                                    0.9946873188018799,
+                                    5.403964042663574,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.002",
+                            "transform": {
+                                "translation": [
+                                    2.0529770851135254,
+                                    13.73928165435791,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.003",
+                            "transform": {
+                                "translation": [
+                                    6.603930473327637,
+                                    55.566307067871094,
+                                    0.24833112955093384
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.004",
+                            "transform": {
+                                "translation": [
+                                    14.393998146057129,
+                                    95.79464721679688,
+                                    2.608693838119507
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.005",
+                            "transform": {
+                                "translation": [
+                                    6.117224216461182,
+                                    130.87045288085938,
+                                    6.133984565734863
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.006",
+                            "transform": {
+                                "translation": [
+                                    -8.148898124694824,
+                                    159.47938537597656,
+                                    6.334571838378906
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.007",
+                            "transform": {
+                                "translation": [
+                                    -13.209879875183105,
+                                    209.93296813964844,
+                                    9.297344207763672
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        {
+                            "type": "ControlPointSpawn",
+                            "name": "ControlPointSpawn.008",
+                            "transform": {
+                                "translation": [
+                                    -7.939479827880859,
+                                    412.1628723144531,
+                                    7.337927341461182
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "EnemyPopEvent",
+            "name": "EnemyPopEvent.001",
+            "transform": {
+                "translation": [
+                    0.0,
+                    140.0626220703125,
+                    6.879013538360596
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": [
+                {
+                    "type": "EnemySpawn",
+                    "name": "EnemySawn",
+                    "transform": {
+                        "translation": [
+                            -42.91783142089844,
+                            176.61416625976562,
+                            5.706044673919678
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "Rail",
+                            "name": "SmallDroneStateShoot.005",
+                            "transform": {
+                                "translation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": [
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.027",
+                                    "transform": {
+                                        "translation": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.028",
+                                    "transform": {
+                                        "translation": [
+                                            10.57400894165039,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.029",
+                                    "transform": {
+                                        "translation": [
+                                            40.56255340576172,
+                                            10.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "EnemySpawn",
+                    "name": "EnemySpawn",
+                    "transform": {
+                        "translation": [
+                            -31.598133087158203,
+                            89.61428833007812,
+                            3.184622287750244
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "Rail",
+                            "name": "SmallDroneStateShoot.003",
+                            "transform": {
+                                "translation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": [
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.021",
+                                    "transform": {
+                                        "translation": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.022",
+                                    "transform": {
+                                        "translation": [
+                                            13.476930618286133,
+                                            16.663238525390625,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.023",
+                                    "transform": {
+                                        "translation": [
+                                            29.71318817138672,
+                                            61.64593505859375,
+                                            -1.491419792175293
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "EnemySpawn",
+                    "name": "EnemySpawn.001",
+                    "transform": {
+                        "translation": [
+                            -37.98334503173828,
+                            133.75634765625,
+                            3.7799277305603027
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "type": "Rail",
+                            "name": "SmallDroneStateShoot.004",
+                            "transform": {
+                                "translation": [
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": [
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.024",
+                                    "transform": {
+                                        "translation": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.025",
+                                    "transform": {
+                                        "translation": [
+                                            18.887462615966797,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "ControlPointSpawn",
+                                    "name": "ControlPointSpawn.026",
+                                    "transform": {
+                                        "translation": [
+                                            40.50831604003906,
+                                            46.7113037109375,
+                                            0.0
+                                        ],
+                                        "rotation": [
+                                            0.0,
+                                            -0.0,
+                                            0.0
+                                        ],
+                                        "scaling": [
+                                            1.0,
+                                            1.0,
+                                            1.0
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.001",
+            "transform": {
+                "translation": [
+                    -18.365358352661133,
+                    113.71615600585938,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.002",
+            "transform": {
+                "translation": [
+                    24.61746597290039,
+                    91.0722885131836,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.003",
+            "transform": {
+                "translation": [
+                    -1.7068181037902832,
+                    414.80059814453125,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.004",
+            "transform": {
+                "translation": [
+                    2.566556453704834,
+                    414.80059814453125,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.005",
+            "transform": {
+                "translation": [
+                    6.320249080657959,
+                    414.80059814453125,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.006",
+            "transform": {
+                "translation": [
+                    16.43728256225586,
+                    192.94039916992188,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.007",
+            "transform": {
+                "translation": [
+                    16.337772369384766,
+                    193.13442993164062,
+                    3.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.008",
+            "transform": {
+                "translation": [
+                    -12.982994079589844,
+                    259.8527526855469,
+                    3.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.009",
+            "transform": {
+                "translation": [
+                    -12.88348388671875,
+                    259.6587219238281,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.010",
+            "transform": {
+                "translation": [
+                    -9.744405746459961,
+                    254.6162109375,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "cube/cube.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.011",
+            "transform": {
+                "translation": [
+                    31.45453643798828,
+                    173.58828735351562,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "wall/wall.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.012",
+            "transform": {
+                "translation": [
+                    -68.43844604492188,
+                    323.5371398925781,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "wall/wall.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.013",
+            "transform": {
+                "translation": [
+                    -34.22572326660156,
+                    141.06869506835938,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "wall/wall.obj"
+        },
+        {
+            "type": "MESH",
+            "name": "Cube.014",
+            "transform": {
+                "translation": [
+                    31.45453643798828,
+                    459.7297668457031,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "wall/wall.obj"
+        }
+    ]
+}
