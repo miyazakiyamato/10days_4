@@ -30,13 +30,16 @@ void Player::Initialize(Model* model, uint32_t textureHandle, ViewProjection* vi
 }
 
 void Player::Update() {
+	// 地面に埋まってしまった場合の即死判定
+	if (isAlive_ && CheckIsBuriedInGround()) {
+		isAlive_ = false;
+	}
 	if (!isAlive_) {
 		return;
 	}
 	if (currentRideBlock_) {
 		worldTransform_.translation_ = MyMtVector3::Add(worldTransform_.translation_, currentRideBlock_->GetVelocity());
 	}
-
 #ifdef _DEBUG
 	ImGui::Begin("player");
 	ImGui::Checkbox("isPush", &isPush_);
@@ -503,7 +506,7 @@ void Player::Draw() {
 	model_->Draw(worldTransform_, *viewProjection_, textureHandle_);
 }
 
-Vector3 Player::GetWorldPosition() {
+Vector3 Player::GetWorldPosition() const{
 	Vector3 pos;
 	pos.x = worldTransform_.matWorld_.m[3][0];
 	pos.y = worldTransform_.matWorld_.m[3][1];
@@ -511,7 +514,7 @@ Vector3 Player::GetWorldPosition() {
 	return pos;
 }
 
-AABB Player::GetAABB() {
+AABB Player::GetAABB() const{
 	Vector3 worldPos = GetWorldPosition();
 	AABB aabb;
 	aabb.min = {worldPos.x - kWidth / 2.0f, worldPos.y - kHeight / 2.0f, worldPos.z - kWidth / 2.0f};
@@ -528,4 +531,38 @@ AABB Player::GetCrushAABB() {
 	aabb.min.y += margin;
 	aabb.max.y -= margin;
 	return aabb;
+}
+bool Player::CheckIsBuriedInGround() const {
+	if (!mapChipField_)
+		return false;
+
+	// プレイヤーの中心位置、あるいは足元の位置を取得
+	Vector3 worldPos = GetWorldPosition();
+
+	// その位置のマップチップのインデックスを取得
+	MapChipField::IndexSet indexSet = mapChipField_->GetMapChipIndexSetByPosition(worldPos);
+
+	// インデックスがマップの範囲内かチェック
+	if (indexSet.xIndex >= mapChipField_->GetNumBlockHorizontal() || indexSet.yIndex >= mapChipField_->GetNumBlockVirtical()) {
+		return false;
+	}
+
+	// その場所のマップチップのタイプを取得
+	MapChipType type = mapChipField_->GetMapChipData(indexSet.xIndex, indexSet.yIndex);
+
+	// もしそこが通常のブロック（kBlock）であり、かつプレイヤーのAABBがそのブロックのRectと深く重なっているなら「埋まっている」
+	if (type == MapChipType::kBlock) {
+		MapChipField::Rect rect = mapChipField_->GatRectByIndex(indexSet.xIndex, indexSet.yIndex);
+		AABB playerAABB = GetAABB();
+
+		// プレイヤーのAABBがブロックのRectの内部に完全に食い込んでいる（ガッツリ埋まっている）か判定
+		bool isOverlapX = (playerAABB.min.x < rect.right && playerAABB.max.x > rect.left);
+		bool isOverlapY = (playerAABB.min.y < rect.top && playerAABB.max.y > rect.bottom);
+
+		if (isOverlapX && isOverlapY) {
+			return true; // 地面に埋まっている！
+		}
+	}
+
+	return false;
 }

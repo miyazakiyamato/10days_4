@@ -172,11 +172,12 @@ private:
 public:
 	WorldTransform* GetWorldTransform() { return &worldTransform_;}
 	const Vector3& GetVelocity() const { return velocity_; }
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() const;
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 	void SetLastEnemy(Enemy* enemy) { lastEnemy = enemy; }
-	AABB GetAABB();
+	AABB GetAABB() const;
 	AABB GetCrushAABB();
+	bool CheckIsBuriedInGround() const;
 	LRDirection GetLRDirection() const { return lrDirection_; }
 	bool GetIsAlive() { return isAlive_; }
 	bool GetIsPush() { return isPush_; }
