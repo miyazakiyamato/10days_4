@@ -3,6 +3,7 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 #include "MyMtMatrix.h"
+#include "Audio.h"
 
 enum class LRDirection {
 	kRight,
@@ -93,6 +94,7 @@ private:
 	//
 	Model* model_ = nullptr;
 	Input* input_ = nullptr;
+	Audio* audio_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
 	//
@@ -164,6 +166,9 @@ private:
 
 	AnimState animState_ = AnimState::kIdle;
 	float animTimeCount_ = 0.0f; // アニメーションの個別タイマー
+
+	uint32_t seJump_ = 0;
+
 public:
 	WorldTransform* GetWorldTransform() { return &worldTransform_;}
 	const Vector3& GetVelocity() const { return velocity_; }

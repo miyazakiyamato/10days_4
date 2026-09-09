@@ -82,8 +82,13 @@ private:
 	// スカイドーム
 	Model* modelSkydome_ = nullptr;
 	Skydome* skydome_ = nullptr;
+	
+	// SE
 	Audio* audio_ = nullptr;
 	uint32_t se_ = 0;
+	uint32_t seSelectNg_ = 0;
+	uint32_t seStageSelect_ = 0;
+	
 	// フェード
 	Fade* fade_ = nullptr;
 
@@ -92,10 +97,12 @@ private:
 	static inline int LimitStageNum_ = 10;
 	int stageNum_ = 0;
 
-	
+	bool isReturnSelect_ = false;
+
 public:
 	// デスフラグのゲッター
 	bool IsFinished() const { return finished_; }
 	int GetStageNum() {return stageNum_ < LimitStageNum_ ? stageNum_ : LimitStageNum_ - 1;}
 	void SetStageNum(int stageNum) { stageNum_ = stageNum < LimitStageNum_ ? stageNum : LimitStageNum_ - 1; }
+	bool GetIsReturnSelect() { return isReturnSelect_; }
 };

@@ -27,7 +27,9 @@ void StageSelect::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	se_ = audio_->LoadWave("maou_se_onepoint25.wav");
+	se_ = audio_->LoadWave("se_select_move.mp3");
+	seSelectNg_ = audio_->LoadWave("se_select_move_ng.mp3");
+	seStageSelect_ = audio_->LoadWave("se_stage_select.mp3");
 
 	worldTransform_.Initialize();
 	uint32_t numBlockVirtical = stageNum_ % 5;
@@ -67,6 +69,12 @@ void StageSelect::Initialize() {
 }
 
 void StageSelect::Update() {
+	if (input_->TriggerKey(DIK_T)) {
+		isReturnSelect_ = true;
+		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
+	}
+
 	skydome_->Update();
 		(this->*spFuncTableUpdate[static_cast<size_t>(phase_)])();
 
@@ -154,30 +162,48 @@ void StageSelect::FadeInUpdate() {
 void StageSelect::MainUpdate() {
 	if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 		stageNum_ += 1;
-		audio_->PlayWave(se_, false);
+		if (stageNum_ >= LimitStageNum_) {
+			stageNum_ = LimitStageNum_ - 1;
+			audio_->PlayWave(seSelectNg_, false);
+		} else {
+			audio_->PlayWave(se_, false);
+		}
 	}
 	if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 		stageNum_ -= 1;
-		audio_->PlayWave(se_, false);
+		if (stageNum_ < 0) {
+			stageNum_ = 0;
+			audio_->PlayWave(seSelectNg_, false);
+		} else {
+			audio_->PlayWave(se_, false);
+		}
 	}
 	if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
 		stageNum_ -= 5;
-		audio_->PlayWave(se_, false);
+		if (stageNum_ < 0) {
+			stageNum_ += 5;
+			audio_->PlayWave(seSelectNg_, false);
+		} else {
+			audio_->PlayWave(se_, false);
+		}
 	}
 	if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
 		stageNum_ += 5;
-		audio_->PlayWave(se_, false);
+		if (stageNum_ >= LimitStageNum_) {
+			stageNum_ -= 5;
+			audio_->PlayWave(seSelectNg_, false);
+		} else {
+			audio_->PlayWave(se_, false);
+		}
 	}
 
-	stageNum_ = stageNum_ < 0 ? 0 : stageNum_;
-	stageNum_ = stageNum_ < LimitStageNum_ ? stageNum_ : LimitStageNum_ - 1;
 	uint32_t numBlockVirtical = stageNum_ % 5;
 	uint32_t numBlockHorizontal = stageNum_ / 5;
 	worldTransform_.translation_ = Vector3(float(numBlockVirtical) * 4.0f, float(numBlockHorizontal) * -6.0f + 2.0f, 0.0f);
 	worldTransform_.UpdateMatrix();
 
 	if (input_->GetInstance()->TriggerKey(DIK_SPACE)) {
-		audio_->PlayWave(se_, false);
+		audio_->PlayWave(seStageSelect_, false);
 		phase_ = Phase::kFadeOut;
 		fade_->Start(Fade::Status::FadeOut, 1.0f);
 	}
