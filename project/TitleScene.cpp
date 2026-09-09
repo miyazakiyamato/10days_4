@@ -11,7 +11,7 @@ void TitleScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	se_ = audio_->LoadWave("maou_se_onepoint25.wav");
+	se_ = audio_->LoadWave("se_title_button_start_2.mp3");
 
 	// [道る記憶]の初期化
 	modelTitle_ = std::unique_ptr<Model>(Model::CreateFromOBJ("TitleLogo", true));
@@ -38,11 +38,28 @@ void TitleScene::Initialize() {
 	title3WorldTransform_.UpdateMatrix();
 	title3WorldTransform_.scale_ = {7.0f, 7.0f, 1.0f};
 	
+	// 待機時間の初期化
+	waitTime_ = 0.0f;
+	isWait_ = false;
 }
 
 void TitleScene::Update() {
+	if (isWait_) {
+		waitTime_ -= 1.0f / 60.0f; // 1フレーム分の時間を減算
+		if (waitTime_ <= 0.0f) {
+			finished_ = true; // シーン終了フラグを立てる
+			return;
+		}
+	}
+
 	// スカイドームの更新
 	skydome_->Update();
+
+	if (input_->TriggerKey(DIK_SPACE)) {
+		audio_->PlayWave(se_, false, 2.0f);
+		isWait_ = true;
+		waitTime_ = kWaitTime;
+	}
 }
 
 void TitleScene::Draw() {
