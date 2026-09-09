@@ -26,15 +26,10 @@ void ButtonBlock::Update() {
 	isCollidingThisFrame_ = false;
 
 	
-	if (isActive_) {
-		Vector4 color = GetColorById(id_);
-		color.w = 1.0f; // アルファ値を1に設定
-		objectColor_->SetColor(color);
-	} else {
-		Vector4 color = GetColorById(id_);
-		color.w = 0.5f; // アルファ値を0.5に設定
-		objectColor_->SetColor(color);
-	}
+	Vector4 color = GetColorById(id_);
+	color.w = isActive_ ? 0.5f : 1.0f;
+	objectColor_->SetColor(color);
+
 	objectColor_->TransferMatrix();
 	worldTransform_.UpdateMatrix();
 }

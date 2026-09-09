@@ -83,6 +83,7 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("Player",true);
 	modelEnemy_ = Model::CreateFromOBJ("cube", true);
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+	buttonBlock_ = Model::CreateFromOBJ("Crystal", true);
 	worldTransform_.Initialize();
 	viewProjection_.farZ = 400.0f;
 	viewProjection_.Initialize();
@@ -119,9 +120,12 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	if (input_->TriggerKey(DIK_R)) {
 		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
 	}
 	if (input_->TriggerKey(DIK_T)) {
-		stop = !stop;
+		isReturnSelect_ = true;
+		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
 	}
 	if (stop) {
 		return;
@@ -164,9 +168,9 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	if (stageNum_ == 0) {
-		//uiSprite_[1]->Draw();
-		//uiSprite_[2]->Draw();
-		//uiSprite_[3]->Draw();
+		uiSprite_[1]->Draw();
+		uiSprite_[2]->Draw();
+		uiSprite_[3]->Draw();
 	}
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -319,7 +323,7 @@ void GameScene::GenerateBlocks() {
 
 			if (cell.type == MapChipType::kButton) {
 				ButtonBlock* newButton = new ButtonBlock;
-				newButton->Initialize(modelEnemy_, TextureManager::Load("./Resources/Button.png"), &viewProjection_, pos);
+				newButton->Initialize(buttonBlock_, TextureManager::Load("./Resources/Button.png"), &viewProjection_, pos);
 				newButton->SetId(cell.id);
 
 				buttons_.push_back(newButton);
@@ -401,12 +405,31 @@ void GameScene::CheckAllCollisions() {
 			goal->OnCollision(player_);
 		}
 	}
-	// 自キャラとボタンの当たり判定
-	aabb1 = player_->GetAABB();
+	// 1. 毎フレームの最初に全ボタンの「今フレームの衝突フラグ」をリセット
 	for (ButtonBlock* button : buttons_) {
-		aabb2 = button->GetAABB();
-		if (Collision::IsCollision(aabb1, aabb2)) {
+		button->SetIsCollidingThisFrame(false); // 内部で isCollidingThisFrame_ = false; にする
+	}
+
+	// 2. 当たり判定チェック
+	AABB playerAABB = player_->GetAABB();
+	ButtonBlock* collidedButton = nullptr;
+
+	for (ButtonBlock* button : buttons_) {
+		AABB buttonAABB = button->GetAABB();
+		if (Collision::IsCollision(playerAABB, buttonAABB)) {
 			button->OnCollision(player_);
+			collidedButton = button; // 接触したボタンを記録
+		}
+	}
+
+	// 3. どちらかのボタンに触れた場合の排他制御（アクティブ切り替え）
+	if (collidedButton != nullptr) {
+		for (ButtonBlock* button : buttons_) {
+			if (button == collidedButton) {
+				button->SetIsActive(true); // 触れたボタンをアクティブ（半透明）に
+			} else {
+				button->SetIsActive(false); // それ以外は非アクティブに
+			}
 		}
 	}
 	// 自キャラと動くブロックの当たり判定
@@ -481,23 +504,31 @@ void GameScene::ChangePhase() {
 			button->Update();
 		}
 		for (MovingBlock* mBlock : movingBlocks_) {
+			bool isAnyActive = false;
 			for (ButtonBlock* button : buttons_) {
 				if (mBlock->GetId() == button->GetId()) {
-					mBlock->SetIsActive(button->GetIsActive());
+					if (button->GetIsActive()) {
+						isAnyActive = true;
+						break; // 1つでもオンなら確定
+					}
 				}
 			}
+			mBlock->SetIsActive(isAnyActive);
 			mBlock->Update(brokenBlocks_);
 		}
 		for (BrokenBlock* bBlock : brokenBlocks_) {
-			// 同じIDのボタンを探してアクティブ状態を同期する
+			bool isAnyActive = false;
 			for (ButtonBlock* button : buttons_) {
 				if (bBlock->GetId() == button->GetId()) {
-					bBlock->SetIsActive(button->GetIsActive());
+					if (button->GetIsActive()) {
+						isAnyActive = true;
+						break; // 1つでもオンなら確定
+					}
 				}
 			}
+			bBlock->SetIsActive(isAnyActive);
 			bBlock->Update(brokenBlocks_, movingBlocks_);
 		}
-
 		player_->SetIsMoveBlock(false);
 		for (auto& pair : objectColors_) {
 			pair.second->TransferMatrix();
