@@ -17,7 +17,7 @@ void TitleScene::Initialize() {
 	modelTitle_ = std::unique_ptr<Model>(Model::CreateFromOBJ("TitleLogo", true));
 	title1WorldTransform_.Initialize();
 	title1WorldTransform_.translation_ = {0.0f, 0.0f, 1.0f};
-	title1WorldTransform_.scale_ = {10.0f, 10.0f, 10.0f}; // Yスケールは0.0fからスタート
+	title1WorldTransform_.scale_ = {10.0f, 10.0f, 10.0f};
 	viewProjection_.Initialize();
 
 	// [Space]の初期化
