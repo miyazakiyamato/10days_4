@@ -63,9 +63,8 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	se_ = audio_->LoadWave("maou_se_magic_fire04.wav");
-	se1_ = audio_->LoadWave("maou_se_magic_ice01.wav");
-	se2_ = audio_->LoadWave("maou_se_magical20.wav");
+	seClear_ = audio_->LoadWave("se_clear_1.mp3");
+
 	//
 	textureHandleBlock_ = TextureManager::Load("./Resources/sibafu.png");
 	textureHandlePlayer_ = TextureManager::Load("./Resources/Player/player.png");
@@ -458,7 +457,6 @@ void GameScene::ChangePhase() {
 				newEnemy->SetMapChipField(mapChipField_);
 				newEnemy->SetPlayer(player_);
 				enemies_.push_back(newEnemy);
-				audio_->PlayWave(se_, false);
 			}
 		}
 		// 敵の更新
@@ -539,7 +537,6 @@ void GameScene::ChangePhase() {
 			phase_ = Phase::kDeath;
 			if (player_->GetIsClear()) {
 				phase_ = Phase::kClear;
-				audio_->PlayWave(se1_, false);
 			}
 			// 自キャラの座標を取得
 			clearParticle_ = new ClearParticle;
@@ -552,7 +549,6 @@ void GameScene::ChangePhase() {
 			/*if (player_->GetIsClear()) {
 				phase_ = Phase::kClear;
 			}*/
-				audio_->PlayWave(se2_, false);
 			// 自キャラの座標を取得
 			deathParticles_ = new DeathParticles;
 			deathParticles_->Initialize(modelPlayer_, textureHandlePlayer_, &viewProjection_, player_->GetWorldPosition());
@@ -574,6 +570,7 @@ void GameScene::ChangePhase() {
 		if (clearParticle_ != nullptr) {
 			clearParticle_->Update();
 		}
+		audio_->PlayWave(seClear_, false);
 		
 		// カメラの更新
 #ifdef _DEBUG

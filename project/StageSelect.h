@@ -82,8 +82,13 @@ private:
 	// スカイドーム
 	Model* modelSkydome_ = nullptr;
 	Skydome* skydome_ = nullptr;
+	
+	// SE
 	Audio* audio_ = nullptr;
 	uint32_t se_ = 0;
+	uint32_t seSelectNg_ = 0;
+	uint32_t seStageSelect_ = 0;
+	
 	// フェード
 	Fade* fade_ = nullptr;
 

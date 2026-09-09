@@ -11,7 +11,7 @@ void TitleScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	se_ = audio_->LoadWave("se_title_button_start_2.mp3");
+	se_ = audio_->LoadWave("se_title_button_start.mp3");
 
 	// [道る記憶]の初期化
 	modelTitle_ = std::unique_ptr<Model>(Model::CreateFromOBJ("TitleLogo", true));

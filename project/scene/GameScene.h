@@ -108,10 +108,10 @@ private: // メンバ変数
 	// スカイドーム
 	Model* modelSkydome_ = nullptr;
 	Skydome* skydome_ = nullptr;
+
+	// SE
 	Audio* audio_ = nullptr;
-	uint32_t se_ = 0;
-	uint32_t se1_ = 0;
-	uint32_t se2_ = 0;
+	uint32_t seClear_ = 0;
 
 	//マップチップフィールド
 	MapChipField* mapChipField_;
