@@ -60,6 +60,9 @@ void StageSelect::Initialize() {
 	skydome_ = new Skydome();
 	skydome_->Initialize(modelSkydome_, &viewProjection_);
 
+	uiSprite_ = std::make_unique<Sprite>();
+	uiSprite_.reset(Sprite::Create(TextureManager::Load("./Resources/selectWay.png"), {0.0f, 0.0f}, {1, 1, 1, 1}, {0, 0}));
+
 	GenerateBlocks();
 	//
 	fade_ = new Fade();
@@ -101,7 +104,7 @@ void StageSelect::Draw() {
 		/// <summary>
 		/// ここに背景スプライトの描画処理を追加できる
 		/// </summary>
-		
+
 		// スプライト描画後処理
 		Sprite::PostDraw();
 		// 深度バッファクリア
@@ -145,6 +148,7 @@ void StageSelect::Draw() {
 		/// <summary>
 		/// ここに前景スプライトの描画処理を追加できる
 		/// </summary>
+		uiSprite_->Draw();
 
 		// スプライト描画後処理
 		Sprite::PostDraw();

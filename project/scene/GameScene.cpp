@@ -74,7 +74,7 @@ void GameScene::Initialize() {
 		uiSprite_.push_back(std::make_unique<Sprite>());
 	}
 	uiSprite_[0].reset(Sprite::Create(TextureManager::Load("./Resources/clear.png"), {}, {1, 1, 1, 1}, {0, 0}));
-	uiSprite_[1].reset(Sprite::Create(TextureManager::Load("./Resources/ope.png"), {120.0f,100.0f}, {1, 1, 1, 1}, {0, 0}));
+	uiSprite_[1].reset(Sprite::Create(TextureManager::Load("./Resources/gameWay.png"), {120.0f,100.0f}, {1, 1, 1, 1}, {0, 0}));
 	uiSprite_[2].reset(Sprite::Create(TextureManager::Load("./Resources/moveWay1.png"), {-61.0f,0.0f}, {1, 1, 1, 1}, {0, 0}));
 	uiSprite_[3].reset(Sprite::Create(TextureManager::Load("./Resources/moveWay3.png"), {410.0f,100.0f}, {1, 1, 1, 1}, {0, 0}));
 	

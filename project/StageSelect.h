@@ -78,6 +78,7 @@ private:
 	std::unique_ptr<Model> modelBlock_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
 
+	std::unique_ptr<Sprite> uiSprite_;
 
 	// スカイドーム
 	Model* modelSkydome_ = nullptr;
