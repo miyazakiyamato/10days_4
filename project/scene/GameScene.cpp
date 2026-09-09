@@ -503,23 +503,32 @@ void GameScene::ChangePhase() {
 			button->Update();
 		}
 		for (MovingBlock* mBlock : movingBlocks_) {
+			bool isAnyActive = false;
 			for (ButtonBlock* button : buttons_) {
 				if (mBlock->GetId() == button->GetId()) {
-					mBlock->SetIsActive(button->GetIsActive());
+					if (button->GetIsActive()) {
+						isAnyActive = true;
+						break; // 1つでもオンなら確定
+					}
 				}
 			}
+			mBlock->SetIsActive(isAnyActive);
 			mBlock->Update(brokenBlocks_);
 		}
+
 		for (BrokenBlock* bBlock : brokenBlocks_) {
-			// 同じIDのボタンを探してアクティブ状態を同期する
+			bool isAnyActive = false;
 			for (ButtonBlock* button : buttons_) {
 				if (bBlock->GetId() == button->GetId()) {
-					bBlock->SetIsActive(button->GetIsActive());
+					if (button->GetIsActive()) {
+						isAnyActive = true;
+						break; // 1つでもオンなら確定
+					}
 				}
 			}
+			bBlock->SetIsActive(isAnyActive);
 			bBlock->Update(brokenBlocks_, movingBlocks_);
 		}
-
 		player_->SetIsMoveBlock(false);
 		for (auto& pair : objectColors_) {
 			pair.second->TransferMatrix();
