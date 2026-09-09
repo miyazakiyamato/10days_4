@@ -174,7 +174,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scene = Scene::kTitle;
 
 	#ifdef _DEBUG
-	//scene = Scene::kStageSelect;
+	scene = Scene::kStageSelect;
 	#endif // _DEBUG
 
 
