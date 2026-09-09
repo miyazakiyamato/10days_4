@@ -63,7 +63,7 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	seClear_ = audio_->LoadWave("se_clear_1.mp3");
+	seClear_ = audio_->LoadWave("se_clear.mp3");
 
 	//
 	textureHandleBlock_ = TextureManager::Load("./Resources/sibafu.png");
@@ -568,6 +568,7 @@ void GameScene::ChangePhase() {
 			phase_ = Phase::kDeath;
 			if (player_->GetIsClear()) {
 				phase_ = Phase::kClear;
+				audio_->PlayWave(seClear_, false);
 			}
 			// 自キャラの座標を取得
 			clearParticle_ = new ClearParticle;
@@ -601,7 +602,6 @@ void GameScene::ChangePhase() {
 		if (clearParticle_ != nullptr) {
 			clearParticle_->Update();
 		}
-		audio_->PlayWave(seClear_, false);
 		
 		// カメラの更新
 #ifdef _DEBUG
