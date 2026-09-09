@@ -123,6 +123,11 @@ void GameScene::Update() {
 		fade_->Start(Fade::Status::FadeOut, 1.0f);
 	}
 	if (input_->TriggerKey(DIK_T)) {
+		isReturnTitle_ = true;
+		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
+	}
+	if (input_->TriggerKey(DIK_Y)) {
 		isReturnSelect_ = true;
 		phase_ = Phase::kFadeOut;
 		fade_->Start(Fade::Status::FadeOut, 1.0f);

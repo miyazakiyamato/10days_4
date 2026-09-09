@@ -153,6 +153,8 @@ private: // メンバ変数
 	std::map<int, ObjectColor*> objectColors_;
 
 	bool isReturnSelect_ = false;
+	bool isReturnTitle_ = false;
+
 public:
 	/// //デスフラグのゲッター
 	bool IsFinished() const { return finished_; }
@@ -160,4 +162,5 @@ public:
 	int GetStageNum() { return stageNum_;}
 	void SetStageNum(int stageNum) { stageNum_ = stageNum; }
 	bool GetIsReturnSelect() { return isReturnSelect_; }
+	bool GetIsReturnTitle() { return isReturnTitle_; }
 };
