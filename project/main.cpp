@@ -72,6 +72,19 @@ void ChangeScene() {
 		if (gameScene->IsFinished()) {
 			nowStageNum = gameScene->GetStageNum();
 			// シーン変更
+			if (gameScene->GetIsReturnSelect()) {
+				// シーン変更
+				scene = Scene::kTitle;
+				// 旧シーンの解放
+				delete gameScene;
+				gameScene = nullptr;
+				// 新シーンの生成初期化
+				delete titleScene;
+				titleScene = new TitleScene;
+				titleScene->Initialize();
+				break;
+			}
+
 			if (!gameScene->GetIsClear()) {
 				scene = Scene::kGame;
 				delete gameScene;
@@ -162,8 +175,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// オーディオの初期化
 	audio = Audio::GetInstance();
 	audio->Initialize();
-	uint32_t bgm = audio->LoadWave("B00203_kamatamago_Chick-flying-in-the-sky.wav");
-	audio->PlayWave(bgm, true);
+	uint32_t bgm = audio->LoadWave("bgm.mp3");
+	audio->PlayWave(bgm, true, 0.5f);
 
 	// テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon->GetDevice());

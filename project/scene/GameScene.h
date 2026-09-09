@@ -108,10 +108,10 @@ private: // メンバ変数
 	// スカイドーム
 	Model* modelSkydome_ = nullptr;
 	Skydome* skydome_ = nullptr;
+
+	// SE
 	Audio* audio_ = nullptr;
-	uint32_t se_ = 0;
-	uint32_t se1_ = 0;
-	uint32_t se2_ = 0;
+	uint32_t seClear_ = 0;
 
 	//マップチップフィールド
 	MapChipField* mapChipField_;
@@ -123,6 +123,7 @@ private: // メンバ変数
 	std::vector<ButtonBlock*> buttons_;
 	std::vector<MovingBlock*> movingBlocks_;
 	std::vector<BrokenBlock*> brokenBlocks_;
+	Model* buttonBlock_ = nullptr;
 	//デバッグ
 	bool isDebagCameraActive = false;
 	DebugCamera* debugCamera_ = nullptr;
@@ -150,10 +151,13 @@ private: // メンバ変数
 	int stageNum_ = 0;
 
 	std::map<int, ObjectColor*> objectColors_;
+
+	bool isReturnSelect_ = false;
 public:
 	/// //デスフラグのゲッター
 	bool IsFinished() const { return finished_; }
 	bool GetIsClear() const { return player_->GetIsClear(); }
 	int GetStageNum() { return stageNum_;}
 	void SetStageNum(int stageNum) { stageNum_ = stageNum; }
+	bool GetIsReturnSelect() { return isReturnSelect_; }
 };

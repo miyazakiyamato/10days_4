@@ -61,7 +61,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(const std::string& directoryPath = "Resources/");
+	void Initialize(const std::string& directoryPath = "resources/sound/");
 
 	/// <summary>
 	/// 終了処理
