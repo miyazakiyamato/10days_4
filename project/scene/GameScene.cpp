@@ -166,9 +166,9 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	if (stageNum_ == 0) {
-		//uiSprite_[1]->Draw();
-		//uiSprite_[2]->Draw();
-		//uiSprite_[3]->Draw();
+		uiSprite_[1]->Draw();
+		uiSprite_[2]->Draw();
+		uiSprite_[3]->Draw();
 	}
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -403,12 +403,31 @@ void GameScene::CheckAllCollisions() {
 			goal->OnCollision(player_);
 		}
 	}
-	// 自キャラとボタンの当たり判定
-	aabb1 = player_->GetAABB();
+	// 1. 毎フレームの最初に全ボタンの「今フレームの衝突フラグ」をリセット
 	for (ButtonBlock* button : buttons_) {
-		aabb2 = button->GetAABB();
-		if (Collision::IsCollision(aabb1, aabb2)) {
+		button->SetIsCollidingThisFrame(false); // 内部で isCollidingThisFrame_ = false; にする
+	}
+
+	// 2. 当たり判定チェック
+	AABB playerAABB = player_->GetAABB();
+	ButtonBlock* collidedButton = nullptr;
+
+	for (ButtonBlock* button : buttons_) {
+		AABB buttonAABB = button->GetAABB();
+		if (Collision::IsCollision(playerAABB, buttonAABB)) {
 			button->OnCollision(player_);
+			collidedButton = button; // 接触したボタンを記録
+		}
+	}
+
+	// 3. どちらかのボタンに触れた場合の排他制御（アクティブ切り替え）
+	if (collidedButton != nullptr) {
+		for (ButtonBlock* button : buttons_) {
+			if (button == collidedButton) {
+				button->SetIsActive(true); // 触れたボタンをアクティブ（半透明）に
+			} else {
+				button->SetIsActive(false); // それ以外は非アクティブに
+			}
 		}
 	}
 	// 自キャラと動くブロックの当たり判定

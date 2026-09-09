@@ -22,6 +22,8 @@ public:
 	
 	int GetId() { return id_; }
 	bool GetIsActive() { return isActive_; }
+	void SetIsActive(bool isActive) { isActive_ = isActive; }
+	void SetIsCollidingThisFrame(bool isColliding) { isCollidingThisFrame_ = isColliding; }
 
 private:
 	WorldTransform worldTransform_;
