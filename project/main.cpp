@@ -72,7 +72,7 @@ void ChangeScene() {
 		if (gameScene->IsFinished()) {
 			nowStageNum = gameScene->GetStageNum();
 			// シーン変更
-			if (gameScene->GetIsReturnSelect()) {
+			if (gameScene->GetIsReturnTitle()) {
 				// シーン変更
 				scene = Scene::kTitle;
 				// 旧シーンの解放
@@ -82,6 +82,19 @@ void ChangeScene() {
 				delete titleScene;
 				titleScene = new TitleScene;
 				titleScene->Initialize();
+				break;
+			}
+			if (gameScene->GetIsReturnSelect()) {
+				// シーン変更
+				scene = Scene::kStageSelect;
+				// 旧シーンの解放
+				delete gameScene;
+				gameScene = nullptr;
+				// 新シーンの生成初期化
+				delete stageSelectScene;
+				stageSelectScene = new StageSelect;
+				stageSelectScene->SetStageNum(nowStageNum);
+				stageSelectScene->Initialize();
 				break;
 			}
 
