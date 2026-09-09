@@ -43,13 +43,13 @@ void Player::Update() {
 
 	// 前フレームの接地状態を記録
 	wasOnGround_ = onGround_;
+	isOnCustomBlock_ = false;
 
 	// 1. 移動とジャンプ入力を処理
-	ProcessMoveAndJump(); 
+	ProcessMoveAndJump();
 
-	// 当たり判定に備えて一度リセットする
 	currentRideBlock_ = nullptr;
-	// 2. 衝突判定とマップ移動処理
+
 	CollisionMapInfo collisionMapInfo;
 	collisionMapInfo.amountMovement = velocity_;
 
@@ -64,18 +64,24 @@ void Player::Update() {
 		GroundingSwitch(collisionMapInfo);
 	}
 
-	// ★【共通化】「直前まで空中（wasOnGround_ == false）」かつ「今接地した（onGround_ == true）」の瞬間だけ必ず潰れアニメーションを発動
+	if (isOnCustomBlock_) {
+		onGround_ = true;
+	}
+
+	// ── 着地した瞬間のトリガー ──
 	if (!wasOnGround_ && onGround_) {
+		// 着地アニメーション（kLand）を予約・強制移行（他のアニメーションをロックする）
+		animState_ = AnimState::kLand;
+		animTimeCount_ = 0.15f; // 例: 0.15秒間はこの着地アニメーションを優先再生
 		worldTransform_.scale_ = {1.4f, 0.6f, 1.4f};
 		targetScale_ = {1.0f, 1.0f, 1.0f};
 	}
 
-	// 3. アニメーション（スケール計算）を処理
+	// ── アニメーションのステート処理 ──
 	ProcessAnimation();
 
-	// 4. スケールの滑らかな補間を処理
+	// ── スケールの滑らかな補間 ──
 	UpdateScaleInterpolation();
-
 	// 旋回制御
 	if (turnTimer_ > 0.0f) {
 		turnTimer_ -= 1.0f / 60.0f;
@@ -263,7 +269,14 @@ void Player::OnCeilingCollision(const CollisionMapInfo& info) {
 }
 
 void Player::GroundingSwitch(const CollisionMapInfo& info) {
-	// 1. マップの底面衝突（MapCollisionBottom）で着地フラグが立ったら接地
+	// すでにカスタムブロックに乗っているフラグが立っているなら、空中落ちは絶対にさせない
+	if (isOnCustomBlock_) {
+		onGround_ = true;
+		velocity_.y = 0.0f;
+		return;
+	}
+
+	// 1. マップの底面衝突で着地
 	if (info.landing) {
 		onGround_ = true;
 		velocity_.x *= (1.0f - kAttenuationLanding);
@@ -271,18 +284,14 @@ void Player::GroundingSwitch(const CollisionMapInfo& info) {
 		return;
 	}
 
-	// 2. すでに接地している場合の足場維持・離脱判定
 	if (onGround_) {
 		if (velocity_.y > 0.0f) {
-			// 上昇中は強制的に空中へ
 			onGround_ = false;
 		} else {
-			// 動くブロックに乗っている場合は接地維持
 			if (currentRideBlock_ != nullptr) {
 				return;
 			}
 
-			// マップチップの足元判定
 			std::array<Vector3, kNumCorner> positionsNew;
 			for (uint32_t i = 0; i < positionsNew.size(); ++i) {
 				positionsNew[i] = CornerPosition(MyMtVector3::Add(worldTransform_.translation_, info.amountMovement), static_cast<Corner>(i));
@@ -299,8 +308,6 @@ void Player::GroundingSwitch(const CollisionMapInfo& info) {
 				hitMap = true;
 			}
 
-			// マップの足場がなく、かつ動くブロックにも乗っていない場合
-			// （さらに、落下し始めている、または完全に足場から外れたとき）
 			if (!hitMap) {
 				onGround_ = false;
 			}
@@ -375,8 +382,11 @@ void Player::ResolveBlockCollision(const AABB& b, bool isMovingBlock, MovingBloc
 			if (velocity_.y < 0.0f) {
 				velocity_.y = 0.0f;
 			}
+
+			// ★【重要】カスタムブロックに乗っていることを明示する
 			onGround_ = true;
-			// 動くブロックの場合は乗っているブロックとして登録
+			isOnCustomBlock_ = true;
+
 			if (isMovingBlock) {
 				currentRideBlock_ = movingBlock;
 			}
@@ -413,31 +423,68 @@ void Player::ProcessMoveAndJump() {
 }
 
 void Player::ProcessAnimation() {
-	targetScale_ = {1.0f, 1.0f, 1.0f};
+	// 1. 排他制御が必要なアニメーション（着地中など）のタイマー処理
+	if (animState_ == AnimState::kLand) {
+		animTimeCount_ -= 1.0f / 60.0f;
+		// 着地アニメーション中は目標スケールを1.0に保ちつつ、補間に任せる（あるいは固定）
+		targetScale_ = {1.0f, 1.0f, 1.0f};
 
+		// 再生時間が終了したら通常のステートに戻れるようにする
+		if (animTimeCount_ <= 0.0f) {
+			animState_ = AnimState::kIdle;
+		}
+		return; // ロック中は他のアニメーション判定を行わない
+	}
+
+	// 2. 空中の判定（ジャンプ・落下）
 	if (!onGround_) {
 		if (velocity_.y > 0.0f) {
-			targetScale_ = {0.8f, 1.2f, 0.8f}; // 上昇中
+			animState_ = AnimState::kJump;
 		} else {
-			targetScale_ = {1.1f, 0.9f, 1.1f}; // 下降中
+			animState_ = AnimState::kJump; // または落下用ステート
 		}
 	} else {
-		// 地上（ステージ床、動くブロック、壊れたブロックの上すべて共通）
-		bool isMovingHorizontally = fabsf(velocity_.x) > 0.01f;
-
-		if (isMovingHorizontally || currentRideBlock_ != nullptr) {
-			// 移動中、または動くブロックに乗って運ばれているとき
-			animTimer_ += 0.3f;
-			float wave = sinf(animTimer_) * 0.15f;
-			targetScale_ = {1.0f + wave, 1.0f - wave, 1.0f + wave};
+		// 3. 地上の判定（移動中か待機中か）
+		bool isMoving = fabsf(velocity_.x) > 0.01f || currentRideBlock_ != nullptr;
+		if (isMoving) {
+			animState_ = AnimState::kRun;
 		} else {
-			// 待機中（普通の床でも、壊れたブロックの上でも共通のプニプニ待機）
-			animTimer_ += 0.07f;
+			animState_ = AnimState::kIdle;
+		}
+	}
+
+	// 4. ステートごとのスケール計算（switch文）
+	switch (animState_) {
+	case AnimState::kIdle:
+		animTimer_ += 0.07f;
+		{
 			float wave = sinf(animTimer_) * 0.04f;
 			targetScale_ = {1.0f - wave, 1.0f + wave, 1.0f - wave};
 		}
+		break;
+
+	case AnimState::kRun:
+		animTimer_ += 0.3f;
+		{
+			float wave = sinf(animTimer_) * 0.15f;
+			targetScale_ = {1.0f + wave, 1.0f - wave, 1.0f + wave};
+		}
+		break;
+
+	case AnimState::kJump:
+		if (velocity_.y > 0.0f) {
+			targetScale_ = {0.8f, 1.2f, 0.8f};
+		} else {
+			targetScale_ = {1.1f, 0.9f, 1.1f};
+		}
+		break;
+
+	case AnimState::kLand:
+		// 上記の排他制御で弾かれるためここには基本的に来ない
+		break;
 	}
 }
+
 void Player::UpdateScaleInterpolation() {
 	worldTransform_.scale_.x += (targetScale_.x - worldTransform_.scale_.x) * 0.25f;
 	worldTransform_.scale_.y += (targetScale_.y - worldTransform_.scale_.y) * 0.25f;

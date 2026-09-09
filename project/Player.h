@@ -16,6 +16,12 @@ enum Corner{
 
 	kNumCorner,//要素数
 };
+enum class AnimState {
+	kIdle, // 待機中
+	kRun,  // 移動中
+	kJump, // ジャンプ中
+	kLand, // 着地時の潰れ（一定時間ロック）
+};
 //マップとの当たり判定
 struct CollisionMapInfo {
 	bool isCeilingCollision = false;
@@ -103,6 +109,7 @@ private:
 	//着地フラグ
 	bool onGround_ = true;
 	bool wasOnGround_ = true;
+	bool isOnCustomBlock_ = false; // 動く・壊れたブロックの上にいるか
 	//移動速度 減衰速度
 	static inline const float kAcceleration = 0.01f;
 	static inline const float kAttenuation = 0.1f;
@@ -154,6 +161,9 @@ private:
 	// 待機・移動アニメーション用タイマー
 	float animTimer_ = 0.0f;
 	bool landedOnBlock_ = false; // ブロックに着地した瞬間フラグ
+
+	AnimState animState_ = AnimState::kIdle;
+	float animTimeCount_ = 0.0f; // アニメーションの個別タイマー
 public:
 	WorldTransform* GetWorldTransform() { return &worldTransform_;}
 	const Vector3& GetVelocity() const { return velocity_; }
