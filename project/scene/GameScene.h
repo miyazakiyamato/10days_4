@@ -123,6 +123,7 @@ private: // メンバ変数
 	std::vector<ButtonBlock*> buttons_;
 	std::vector<MovingBlock*> movingBlocks_;
 	std::vector<BrokenBlock*> brokenBlocks_;
+	Model* buttonBlock_ = nullptr;
 	//デバッグ
 	bool isDebagCameraActive = false;
 	DebugCamera* debugCamera_ = nullptr;

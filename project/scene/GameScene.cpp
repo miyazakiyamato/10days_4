@@ -84,6 +84,7 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("Player",true);
 	modelEnemy_ = Model::CreateFromOBJ("cube", true);
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+	buttonBlock_ = Model::CreateFromOBJ("Crystal", true);
 	worldTransform_.Initialize();
 	viewProjection_.farZ = 400.0f;
 	viewProjection_.Initialize();
@@ -320,7 +321,7 @@ void GameScene::GenerateBlocks() {
 
 			if (cell.type == MapChipType::kButton) {
 				ButtonBlock* newButton = new ButtonBlock;
-				newButton->Initialize(modelEnemy_, TextureManager::Load("./Resources/Button.png"), &viewProjection_, pos);
+				newButton->Initialize(buttonBlock_, TextureManager::Load("./Resources/Button.png"), &viewProjection_, pos);
 				newButton->SetId(cell.id);
 
 				buttons_.push_back(newButton);
