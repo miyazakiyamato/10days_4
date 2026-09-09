@@ -18,6 +18,9 @@ void Player::Initialize(Model* model, uint32_t textureHandle, ViewProjection* vi
 	assert(model);
 	model_ = model;
 	input_ = Input::GetInstance();
+	audio_ = Audio::GetInstance();
+	seJump_ = audio_->LoadWave("se_character_jump.mp3");
+
 	textureHandle_ = textureHandle;
 	worldTransform_.Initialize();
 	viewProjection_ = viewProjection;
@@ -419,6 +422,8 @@ void Player::ProcessMoveAndJump() {
 
 		worldTransform_.scale_ = {0.6f, 1.5f, 0.6f};
 		targetScale_ = {1.0f, 1.0f, 1.0f};
+
+		audio_->PlayWave(seJump_);
 	}
 }
 
