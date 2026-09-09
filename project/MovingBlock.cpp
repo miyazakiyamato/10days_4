@@ -62,6 +62,9 @@ void MovingBlock::Update(const std::vector<BrokenBlock*>& brokenBlocks) {
 
 				AABB otherAABB = bBlock->GetAABB();
 				if (Collision::IsCollision(myAABB, otherAABB)) {
+					if (otherAABB.min.y >= myAABB.max.y - 0.2f) {
+						continue;
+					}
 					hasCollided = true;
 					break;
 				}
