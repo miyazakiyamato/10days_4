@@ -67,6 +67,12 @@ void StageSelect::Initialize() {
 }
 
 void StageSelect::Update() {
+	if (input_->TriggerKey(DIK_T)) {
+		isReturnSelect_ = true;
+		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
+	}
+
 	skydome_->Update();
 		(this->*spFuncTableUpdate[static_cast<size_t>(phase_)])();
 
