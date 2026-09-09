@@ -513,3 +513,14 @@ AABB Player::GetAABB() {
 	aabb.max = {worldPos.x + kWidth / 2.0f, worldPos.y + kHeight / 2.0f, worldPos.z + kWidth / 2.0f};
 	return aabb;
 }
+
+AABB Player::GetCrushAABB() {
+	AABB aabb = GetAABB();
+	// 外側を少し削って、中心付近の「ちっちゃいAABB」にする（例: マージンを0.4f〜0.5fほど縮める）
+	float margin = 0.5f;
+	aabb.min.x += margin;
+	aabb.max.x -= margin;
+	aabb.min.y += margin;
+	aabb.max.y -= margin;
+	return aabb;
+}

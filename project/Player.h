@@ -171,6 +171,7 @@ public:
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
 	void SetLastEnemy(Enemy* enemy) { lastEnemy = enemy; }
 	AABB GetAABB();
+	AABB GetCrushAABB();
 	LRDirection GetLRDirection() const { return lrDirection_; }
 	bool GetIsAlive() { return isAlive_; }
 	bool GetIsPush() { return isPush_; }

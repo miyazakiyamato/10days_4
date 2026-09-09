@@ -124,8 +124,35 @@ void BrokenBlock::Update(const std::vector<BrokenBlock*>& brokenBlocks, const st
 
 	// 今回のフレームでの実際の移動量を速度として記録
 	velocity_ = {worldTransform_.translation_.x - prePos.x, worldTransform_.translation_.y - prePos.y, worldTransform_.translation_.z - prePos.z};
-
+	
 	worldTransform_.UpdateMatrix();
+
+	if (player_ && player_->GetIsAlive()) {
+		AABB myAABB = GetAABB();
+		AABB playerAABB = player_->GetCrushAABB();
+
+		if (Collision::IsCollision(myAABB, playerAABB)) {
+			// 1. 各方向のガッツリ重なっている深さを正確に計算
+			float overlapLeft = playerAABB.max.x - myAABB.min.x;   // プレイヤーが右からブロックに食い込んでいる深さ
+			float overlapRight = myAABB.max.x - playerAABB.min.x;  // ブロックが右からプレイヤーに食い込んでいる深さ
+			float overlapBottom = playerAABB.max.y - myAABB.min.y; // プレイヤーが下からブロックに食い込んでいる深さ
+			float overlapTop = myAABB.max.y - playerAABB.min.y;    // ブロックが上からプレイヤーに食い込んでいる深さ
+
+			// 2. 「上に乗っている」安全な状態の判定
+			bool isRidingOnTop = (playerAABB.min.y >= myAABB.max.y - 0.3f) && (overlapTop > 0.0f && overlapTop < 0.25f);
+
+			if (!isRidingOnTop) {
+				// ★「誰が見てもガッツリ重なっている」と判断する深さの閾値（0.8f）
+				constexpr float kFullCrushThreshold = 0.8f;
+
+				// どの方向であっても、十分に深く食い込んでいる場合のみ死亡
+				if (overlapLeft > kFullCrushThreshold || overlapRight > kFullCrushThreshold || overlapBottom > kFullCrushThreshold || overlapTop > kFullCrushThreshold) {
+
+					player_->SetIsAlive(false);
+				}
+			}
+		}
+	}
 }
 
 void BrokenBlock::Draw() { model_->Draw(worldTransform_, *viewProjection_, textureHandle_, objectColor_); }

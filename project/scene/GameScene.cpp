@@ -341,7 +341,6 @@ void GameScene::GenerateBlocks() {
 				if (cell.id != -1) {
 					newMovingBlock->SetObjectColor(objectColors_[cell.id]);
 				}
-
 				movingBlocks_.push_back(newMovingBlock);
 			} else if (cell.type == MapChipType::kBrokenBlock) {
 				BrokenBlock* newBrokenBlock = new BrokenBlock;
@@ -360,6 +359,7 @@ void GameScene::GenerateBlocks() {
 
 	// 生成後にIDを基準にして、終わりの位置（0_0など）をMovingBlockに教える
 	for (MovingBlock* movingBlock : movingBlocks_) {
+		movingBlock->SetPlayer(player_);
 		int id = movingBlock->GetId();
 		if (waypointsMap.find(id) != waypointsMap.end() && waypointsMap[id].size() >= 2) {
 			// waypointsMap[id][0] は自身の初期位置(5_0など)
@@ -367,6 +367,9 @@ void GameScene::GenerateBlocks() {
 			Vector3 endPos = waypointsMap[id][1];
 			movingBlock->SetEndPosition(endPos);
 		}
+	}
+	for (BrokenBlock* brokenBlock : brokenBlocks_) {
+		brokenBlock->SetPlayer(player_);
 	}
 }
 

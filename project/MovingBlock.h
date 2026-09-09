@@ -15,7 +15,7 @@ public:
 	void Update(const std::vector<BrokenBlock*>& brokenBlocks);
 	void Draw();
 	void OnCollision(const Player* player);
-
+	void SetPlayer(Player* player) { player_ = player; }
 	WorldTransform* GetWorldTransform() { return &worldTransform_; }
 	Vector3 GetWorldPosition();
 	AABB GetAABB();
@@ -39,6 +39,7 @@ private:
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0u;
 	ObjectColor* objectColor_ = nullptr;
+	Player* player_ = nullptr;
 
 	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
 

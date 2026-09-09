@@ -20,6 +20,8 @@ public:
 	WorldTransform* GetWorldTransform() { return &worldTransform_; }
 	Vector3 GetWorldPosition();
 	AABB GetAABB();
+	
+	void SetPlayer(Player* player) { player_ = player; }
 
 	void SetId(int id) { id_ = id; }
 	int GetId() { return id_; }
@@ -39,6 +41,7 @@ private:
 	uint32_t textureHandle_ = 0u;
 	ObjectColor* objectColor_ = nullptr;
 	MapChipField* mapChipField_ = nullptr; // 追加
+	Player* player_ = nullptr; // 追加
 
 	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
 	Vector3 targetPos_ = {0.0f, 0.0f, 0.0f}; // 追加：元の位置を記録する変数
