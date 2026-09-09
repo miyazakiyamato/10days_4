@@ -66,4 +66,9 @@ private:
 	uint32_t se_ = 0;
 	// シーンの終了フラグ
 	bool finished_ = false;
+
+	// シーン切り替え待機
+	float waitTime_ = 0.0f;
+	const float kWaitTime = 1.0f;
+	bool isWait_ = false;
 };

@@ -150,8 +150,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// オーディオの初期化
 	audio = Audio::GetInstance();
 	audio->Initialize();
-	uint32_t bgm = audio->LoadWave("B00203_kamatamago_Chick-flying-in-the-sky.wav");
-	audio->PlayWave(bgm, true);
+	uint32_t bgm = audio->LoadWave("bgm.mp3");
+	audio->PlayWave(bgm, true, 0.5f);
 
 	// テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon->GetDevice());
@@ -174,7 +174,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scene = Scene::kTitle;
 
 	#ifdef _DEBUG
-	scene = Scene::kStageSelect;
+	//scene = Scene::kStageSelect;
 	#endif // _DEBUG
 
 
