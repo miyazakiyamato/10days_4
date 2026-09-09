@@ -151,10 +151,13 @@ private: // メンバ変数
 	int stageNum_ = 0;
 
 	std::map<int, ObjectColor*> objectColors_;
+
+	bool isReturnSelect_ = false;
 public:
 	/// //デスフラグのゲッター
 	bool IsFinished() const { return finished_; }
 	bool GetIsClear() const { return player_->GetIsClear(); }
 	int GetStageNum() { return stageNum_;}
 	void SetStageNum(int stageNum) { stageNum_ = stageNum; }
+	bool GetIsReturnSelect() { return isReturnSelect_; }
 };

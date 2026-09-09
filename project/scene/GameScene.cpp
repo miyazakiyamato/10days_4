@@ -121,9 +121,12 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	if (input_->TriggerKey(DIK_R)) {
 		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
 	}
 	if (input_->TriggerKey(DIK_T)) {
-		stop = !stop;
+		isReturnSelect_ = true;
+		phase_ = Phase::kFadeOut;
+		fade_->Start(Fade::Status::FadeOut, 1.0f);
 	}
 	if (stop) {
 		return;
@@ -515,7 +518,6 @@ void GameScene::ChangePhase() {
 			mBlock->SetIsActive(isAnyActive);
 			mBlock->Update(brokenBlocks_);
 		}
-
 		for (BrokenBlock* bBlock : brokenBlocks_) {
 			bool isAnyActive = false;
 			for (ButtonBlock* button : buttons_) {
