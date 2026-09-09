@@ -71,7 +71,16 @@ public:
 	void OnCollision(MovingBlock* movingBlock);
 	void OnCollision(BrokenBlock* brokenBlock);
 
+	void ResolveBlockCollision(const AABB& b, bool isMovingBlock, MovingBlock* movingBlock = nullptr);
+
+	void ProcessMoveAndJump();
+
+	void ProcessAnimation();
+
+	void UpdateScaleInterpolation();
+
 private:
+
 	//ワールド返還データ
 	WorldTransform worldTransform_;
 	ViewProjection* viewProjection_ = nullptr;
@@ -93,16 +102,17 @@ private:
 	static inline const float kTimeTurn = 0.3f;
 	//着地フラグ
 	bool onGround_ = true;
+	bool wasOnGround_ = true;
 	//移動速度 減衰速度
 	static inline const float kAcceleration = 0.01f;
 	static inline const float kAttenuation = 0.1f;
 
 	//重力加速度下
-	static inline const float kGravityAcceleration = 0.098f;
+	static inline const float kGravityAcceleration = 0.045f;
 	//最大落下速度下
 	static inline const float kLimitFallSpeed = kGravityAcceleration * 100.f;
 	//ジャンプ初速
-	static inline const float kJumpAcceleration = 0.7f;
+	static inline const float kJumpAcceleration = 0.65f;
 	//着地時の速度減衰率
 	static inline const float kAttenuationLanding = 0.1f;
 	//着地時の速度減衰率
@@ -136,6 +146,14 @@ private:
 	bool isPushSpace_ = false;
 
 	MovingBlock* currentRideBlock_ = nullptr;
+	
+	// スライムアニメーション用のスケール管理
+	Vector3 baseScale_ = {1.0f, 1.0f, 1.0f};
+	Vector3 targetScale_ = {1.0f, 1.0f, 1.0f};
+
+	// 待機・移動アニメーション用タイマー
+	float animTimer_ = 0.0f;
+	bool landedOnBlock_ = false; // ブロックに着地した瞬間フラグ
 public:
 	WorldTransform* GetWorldTransform() { return &worldTransform_;}
 	const Vector3& GetVelocity() const { return velocity_; }
